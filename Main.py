@@ -4,6 +4,15 @@ from Model.DataAccessor.JsonAccessor.JsonAccessor import load_json
 from Model.Constant import Configure
 
 
+def exchange_currency(origin):
+    if origin == "USD":
+        return 30.9
+    elif origin == "NTD":
+        return 1
+    else:
+        return 0
+
+
 class Subject(object):
     @staticmethod
     def sum(subjects, getter=lambda s: s.volume()):
@@ -29,6 +38,7 @@ class Subject(object):
         self.desc = next(iterator)
         self.type = next(iterator)
         self.region = next(iterator)
+        self.currency_ratio = exchange_currency(next(iterator))
         self.current_price = next(iterator)
 
         self.holding = 0
@@ -42,7 +52,7 @@ class Subject(object):
     def volume(self, current_price=None):
         if current_price is None:
             current_price = self.current_price
-        return self.holding * current_price
+        return self.holding * current_price * self.currency_ratio
 
 
 if __name__ == "__main__":
@@ -55,6 +65,7 @@ if __name__ == "__main__":
     type_res = Subject.sum_by_group(subjects, 'type')
     region_res = Subject.sum_by_group(subjects, 'region')
 
-    print("Total: %.2f" % Subject.sum(subjects))
+    print("Total: NTD %.2f*10K (USD %.2f*K)"
+          % (Subject.sum(subjects) / 10000, Subject.sum(subjects) / exchange_currency("USD") / 1000))
     print(["{0}: {1:2.2f}%".format(res[0], res[2]*100) for res in type_res])
     print(["{0}: {1:2.2f}%".format(res[0], res[2]*100) for res in region_res])
