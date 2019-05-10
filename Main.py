@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from Model.DataAccessor.JsonAccessor.JsonAccessor import load_json
+from Model.Constant import Configure
 
 
 class Subject(object):
@@ -45,7 +46,7 @@ class Subject(object):
 
 
 if __name__ == "__main__":
-    data = load_json("Data/data.json")
+    data = load_json(Configure.CONFIG['json_path'])
     subjects = [Subject(subject) for subject in data['subject']]
     for id_, transactions in data['transaction'].items():
         subject = next(filter(lambda s: s.id == id_, subjects))
