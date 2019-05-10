@@ -1,3 +1,6 @@
 [submodule "Model/DataAccessor/JsonAccessor"]
 	path = Model/DataAccessor/JsonAccessor
 	url = git@github.com:YiFanChen99/JsonAccessor.git
+[submodule "Model/DataAccessor/ConfigureIntegrator"]
+	path = Model/DataAccessor/ConfigureIntegrator
+	url = git@github.com:YiFanChen99/ConfigureIntegrator.git
