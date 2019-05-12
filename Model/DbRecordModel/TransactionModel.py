@@ -10,8 +10,13 @@ TYPE_MAP = SimpleModelMap(TransactionType)
 class TransactionModel(BaseRecordModel):
     ACCESSOR = Transaction
 
+    @classmethod
+    def create_record(cls, date, type_, account, subject, price, amount, commission):
+        rec = cls(date, type_, account, subject, price, amount, commission)
+        rec.sync_to_db()
+        return rec
+
     def _init_by_record(self, record):
-        self.id = record.id
         self._init_by_args(iter((record.date, record.type, record.account, record.subject,
                                  record.price, record.amount, record.commission)))
 
@@ -29,9 +34,3 @@ class TransactionModel(BaseRecordModel):
             'date': self.date, 'type': self.type, 'account': self.account, 'subject': self.subject,
             'price': self.price, 'amount': self.amount, 'commission': self.commission
         }
-
-    @classmethod
-    def create_record(cls, date, type_, account, subject, price, amount, commission):
-        rec = cls(date, type_, account, subject, price, amount, commission)
-        rec.sync_to_db()
-        return rec

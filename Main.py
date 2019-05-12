@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from datetime import date
+
+from Model.Constant import CONFIGURE
 from Model.DataAccessor.JsonAccessor.JsonAccessor import load_json
-from Model.Constant import Configure
+from Model.DbRecordModel.AccountModel import AccountModel
+from Model.DbRecordModel.SubjectModel import SubjectModel, TYPE_MAP as S_TYPE_MAP, REGION_MAP
+from Model.DbRecordModel.TransactionModel import TransactionModel, TYPE_MAP as T_TYPE_MAP
 
 
 def exchange_currency(origin):
@@ -56,7 +61,7 @@ class Subject(object):
 
 
 def main1():
-    data = load_json(Configure.CONFIG['json_path'])
+    data = load_json(CONFIGURE.CONFIG['json_path'])
     subjects = [Subject(subject) for subject in data['subject']]
     for id_, transactions in data['transaction'].items():
         subject = next(filter(lambda s: s.id == id_, subjects))
@@ -72,19 +77,14 @@ def main1():
 
 
 def create_subjects():
-    from Model.DbRecordModel.SubjectModel import SubjectModel, TYPE_MAP, REGION_MAP
-    print('type:', TYPE_MAP)
+    print('type:', S_TYPE_MAP)
     print('region:', REGION_MAP)
-    # sm2 = SubjectModel.create_record('006208', 1, 2, 'NTD')
+    sm2 = SubjectModel.create_record('006208', 1, 2, 'NTD')
     print('create_subjects end')
 
 
 def create_transactions():
-    from Model.DbRecordModel.AccountModel import AccountModel
-    from Model.DbRecordModel.SubjectModel import SubjectModel
-    from Model.DbRecordModel.TransactionModel import TransactionModel, TYPE_MAP
-    from datetime import date
-    print('type:', TYPE_MAP)
+    print('type:', T_TYPE_MAP)
     ft = AccountModel.get(id=2)
     itot = SubjectModel.get(code='ITOT')
     TransactionModel.create_record(date(2019, 5, 12), 1, ft.id, itot.id, 66.52, 50, 0)
@@ -93,11 +93,13 @@ def create_transactions():
 
 
 def main2():
-    from Model.DataAccessor.DbAccessor.DbOrmAccessor import db
-    db.init(Configure.CONFIG['db_path'])
-    db.connect()
+    ft = AccountModel.get(id=2)
+    print('ft balance: ', ft.balance)
 
-    create_transactions()
+    first_tr = ft.record.transaction_
+    ft_subjs = ft.subjects
+    amount_list = [(sub.code, SubjectModel(sub).holding) for sub in ft_subjs]
+    create_subjects()
     print('end')
 
 

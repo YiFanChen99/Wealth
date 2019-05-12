@@ -6,11 +6,11 @@ class BaseRecordModel(object):
     ACCESSOR = None
 
     def __init__(self, *args):
-        self.id = None
-
         if isinstance(args[0], self.ACCESSOR):
-            self._init_by_record(args[0])
+            self.record = args[0]
+            self._init_by_record(self.record)
         else:
+            self.record = None
             self._init_by_args(iter(args))
 
     def _init_by_record(self, record):
@@ -20,10 +20,14 @@ class BaseRecordModel(object):
         raise NotImplementedError
 
     def sync_to_db(self):
-        self.id = self.ACCESSOR.replace(id=self.id, **self._get_sync_kwargs()).execute()
+        self.record = self.ACCESSOR.replace(id=self.id, **self._get_sync_kwargs()).execute()
 
     def _get_sync_kwargs(self):
         raise NotImplementedError
+
+    @property
+    def id(self):
+        return None if self.record is None else self.record.id
 
     @classmethod
     def get(cls, **kwargs):
