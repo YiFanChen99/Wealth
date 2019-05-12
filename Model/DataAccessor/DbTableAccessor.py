@@ -8,21 +8,21 @@ class SubjectType(BaseModel):
     name = TextField(unique=True)
 
     def __repr__(self):
-        return self.name
+        return repr(self.name)
 
 
 class SubjectRegion(BaseModel):
     name = TextField(unique=True)
 
     def __repr__(self):
-        return self.name
+        return repr(self.name)
 
 
 class TransactionType(BaseModel):
     name = TextField(unique=True)
 
     def __repr__(self):
-        return self.name
+        return repr(self.name)
 
 
 class Account(BaseModel):

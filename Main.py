@@ -55,7 +55,7 @@ class Subject(object):
         return self.holding * current_price * self.currency_ratio
 
 
-if __name__ == "__main__":
+def main1():
     data = load_json(Configure.CONFIG['json_path'])
     subjects = [Subject(subject) for subject in data['subject']]
     for id_, transactions in data['transaction'].items():
@@ -69,3 +69,24 @@ if __name__ == "__main__":
           % (Subject.sum(subjects) / 10000, Subject.sum(subjects) / exchange_currency("USD") / 1000))
     print(["{0}: {1:2.2f}%".format(res[0], res[2]*100) for res in type_res])
     print(["{0}: {1:2.2f}%".format(res[0], res[2]*100) for res in region_res])
+
+
+def create_subjects():
+    from Model.DbRecordModel.SubjectModel import SubjectModel, SubjectUtility
+    print('type:', SubjectUtility.TYPE_MAP)
+    print('region:', SubjectUtility.REGION_MAP)
+    sm2 = SubjectModel.create_record('006208', 1, 2, 'NTD')
+    print('create_subjects end')
+
+
+def main2():
+    from Model.DataAccessor.DbAccessor.DbOrmAccessor import db
+    db.init(Configure.CONFIG['db_path'])
+    db.connect()
+
+    print('end')
+
+
+if __name__ == "__main__":
+    # main1()
+    main2()
