@@ -72,10 +72,10 @@ def main1():
 
 
 def create_subjects():
-    from Model.DbRecordModel.SubjectModel import SubjectModel, SubjectUtility
-    print('type:', SubjectUtility.TYPE_MAP)
-    print('region:', SubjectUtility.REGION_MAP)
-    sm2 = SubjectModel.create_record('006208', 1, 2, 'NTD')
+    from Model.DbRecordModel.SubjectModel import SubjectModel, TYPE_MAP, REGION_MAP
+    print('type:', TYPE_MAP)
+    print('region:', REGION_MAP)
+    # sm2 = SubjectModel.create_record('006208', 1, 2, 'NTD')
     print('create_subjects end')
 
 
@@ -84,6 +84,7 @@ def main2():
     db.init(Configure.CONFIG['db_path'])
     db.connect()
 
+    create_subjects()
     print('end')
 
 
