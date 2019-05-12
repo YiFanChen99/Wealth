@@ -79,12 +79,25 @@ def create_subjects():
     print('create_subjects end')
 
 
+def create_transactions():
+    from Model.DbRecordModel.AccountModel import AccountModel
+    from Model.DbRecordModel.SubjectModel import SubjectModel
+    from Model.DbRecordModel.TransactionModel import TransactionModel, TYPE_MAP
+    from datetime import date
+    print('type:', TYPE_MAP)
+    ft = AccountModel.get(id=2)
+    itot = SubjectModel.get(code='ITOT')
+    TransactionModel.create_record(date(2019, 5, 12), 1, ft.id, itot.id, 66.52, 50, 0)
+
+    print('create_transactions end')
+
+
 def main2():
     from Model.DataAccessor.DbAccessor.DbOrmAccessor import db
     db.init(Configure.CONFIG['db_path'])
     db.connect()
 
-    create_subjects()
+    create_transactions()
     print('end')
 
 

@@ -25,6 +25,12 @@ class BaseRecordModel(object):
     def _get_sync_kwargs(self):
         raise NotImplementedError
 
+    @classmethod
+    def get(cls, **kwargs):
+        if cls.ACCESSOR is None:
+            raise NotImplementedError
+        return cls(cls.ACCESSOR.get(**kwargs))
+
 
 class SimpleModelMap(object):
     def __init__(self, accessor):
