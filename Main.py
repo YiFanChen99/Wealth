@@ -2,22 +2,12 @@
 # -*- coding: utf-8 -*-
 from datetime import date
 
-from Model.Constant import CONFIGURE
-from Model.DataAccessor.JsonAccessor.JsonAccessor import load_json
-from Model.DbRecordModel.AccountModel import AccountModel
-from Model.DbRecordModel.SubjectModel import SubjectModel, TYPE_MAP as S_TYPE_MAP, REGION_MAP
-from Model.DbRecordModel.TransactionModel import TransactionModel, TYPE_MAP as T_TYPE_MAP
+from Model.Constant import CONFIGURE  # init db
+from Model.DbRecordModel.AccountModel import Account
+from Model.DbRecordModel.SubjectModel import Subject, TYPE_MAP as S_TYPE_MAP, REGION_MAP
+from Model.DbRecordModel.TransactionModel import Transaction, TYPE_MAP as T_TYPE_MAP
 
-
-def exchange_currency(origin):
-    if origin == "USD":
-        return 30.9
-    elif origin == "NTD":
-        return 1
-    else:
-        return 0
-
-
+'''
 class Subject(object):
     @staticmethod
     def sum(subjects, getter=lambda s: s.volume()):
@@ -74,35 +64,41 @@ def main1():
           % (Subject.sum(subjects) / 10000, Subject.sum(subjects) / exchange_currency("USD") / 1000))
     print(["{0}: {1:2.2f}%".format(res[0], res[2]*100) for res in type_res])
     print(["{0}: {1:2.2f}%".format(res[0], res[2]*100) for res in region_res])
+'''
 
 
 def create_subjects():
     print('type:', S_TYPE_MAP)
     print('region:', REGION_MAP)
-    sm2 = SubjectModel.create_record('006208', 1, 2, 'NTD')
+    sm2 = Subject.create(code='006209', type_id=1, region_id=2, currency_code='NTD')
     print('create_subjects end')
 
 
 def create_transactions():
     print('type:', T_TYPE_MAP)
-    ft = AccountModel.get(id=2)
-    itot = SubjectModel.get(code='ITOT')
-    TransactionModel.create_record(date(2019, 5, 12), 1, ft.id, itot.id, 66.52, 50, 0)
-
+    ft = Account.get(id=2)
+    tlt = Subject.get(code='TLT')
+    Transaction.create(date=date(2019, 4, 30), type_id=2, account=ft, subject=tlt,
+                       price=123.38, amount=35, commission=0)
+    Transaction.create(date=date(2019, 4, 30), type_id=2, account=ft, subject=tlt,
+                       price=123.41, amount=3, commission=0)
+    agg = Subject.get(code='AGG')
+    Transaction.create(date=date(2019, 4, 30), type_id=2, account=ft, subject=agg,
+                       price=108.64, amount=18, commission=0)
     print('create_transactions end')
 
 
 def main2():
-    ft = AccountModel.get(id=2)
+    # create_transactions()
+
+    ft = Account.get(id=2)
     print('ft balance: ', ft.balance)
 
-    first_tr = ft.record.transaction_
+    first_tr = ft.transactions
     ft_subjs = ft.subjects
-    amount_list = [(sub.code, SubjectModel(sub).holding) for sub in ft_subjs]
-    create_subjects()
+    amount_list = [(sub.code, sub.holding) for sub in ft_subjs]
     print('end')
 
 
 if __name__ == "__main__":
-    # main1()
     main2()

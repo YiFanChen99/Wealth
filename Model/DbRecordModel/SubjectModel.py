@@ -1,52 +1,58 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from Model.DbRecordModel.BaseModel import BaseRecordModel, SimpleModelMap
+from peewee import *
+
+from Model.DataAccessor.DbAccessor.DbOrmAccessor import BaseModel, SimpleModelMap
 from Model.DbRecordModel.Utility import TransactionSummarizer
-from Model.DataAccessor.DbTableAccessor import Subject, SubjectType, SubjectRegion
 from Model.Currency import create_currency
 
 
-TYPE_MAP = SimpleModelMap(SubjectType)
-REGION_MAP = SimpleModelMap(SubjectRegion)
+class SubjectType(BaseModel):
+    name = TextField(unique=True)
+
+    def __repr__(self):
+        return repr(self.name)
 
 
-class SubjectModel(BaseRecordModel):
-    ACCESSOR = Subject
+class SubjectRegion(BaseModel):
+    name = TextField(unique=True)
 
-    @classmethod
-    def create_record(cls, code, type_, region, currency):
-        rec = cls(code, type_, region, currency)
-        rec.sync_to_db()
-        return rec
+    def __repr__(self):
+        return repr(self.name)
 
-    def _init_by_record(self, record):
-        self._init_by_args(iter((record.code, record.type, record.region, record.currency)))
 
-    def _init_by_args(self, iterator):
-        self.code = next(iterator)
-        self.type = TYPE_MAP.get_record(next(iterator))
-        self.region = REGION_MAP.get_record(next(iterator))
-        self.currency = create_currency(next(iterator))
+class Subject(BaseModel):
+    code = TextField(unique=True)
+    type = ForeignKeyField(SubjectType, backref='subject_')
+    region = ForeignKeyField(SubjectRegion, backref='subject_')
+    currency_code = TextField()
 
-    def _get_sync_kwargs(self):
-        return {
-            'code': self.code, 'type': self.type,
-            'region': self.region, 'currency': self.currency.code
-        }
+    # noinspection PyTypeChecker
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.currency = create_currency(self.currency_code)
 
     @property
     def transactions(self):
-        if self.record is None:
-            raise ValueError("Non-created Account.")
-        return self.record.transactions
+        return self.transaction_
 
     @property
     def accounts(self):
-        if self.record is None:
-            raise ValueError("Non-created Account.")
-        return self.record.accounts
+        return set(trans.account for trans in self.transactions)
 
     @property
     def holding(self):
         result = TransactionSummarizer(self.transactions)
         return result.net_amount
+
+
+def _create_tables():
+    """
+    Peewee will create tables in all-lowercases.
+    """
+    from Model.DataAccessor.DbAccessor.DbOrmAccessor import db
+    db.create_tables([SubjectType, SubjectRegion, Subject])
+
+
+TYPE_MAP = SimpleModelMap(SubjectType)
+REGION_MAP = SimpleModelMap(SubjectRegion)

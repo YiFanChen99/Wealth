@@ -4,8 +4,6 @@ import os
 
 from Model.DataAccessor.ConfigureIntegrator.Loader import ConfigureLoader as ConLoader
 from Model.DataAccessor.DbAccessor.DbOrmAccessor import db
-from Model.DataAccessor.DbTableAccessor import SubjectType, SubjectRegion, TransactionType
-from Model.DbRecordModel.BaseModel import SimpleModelMap
 
 
 class Path(object):

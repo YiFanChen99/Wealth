@@ -1,31 +1,37 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import math  # for eval commission_rule
+from peewee import *
 
-from Model.DbRecordModel.BaseModel import BaseRecordModel
+from Model.DataAccessor.DbAccessor.DbOrmAccessor import BaseModel
 from Model.DbRecordModel.Utility import TransactionSummarizer
-from Model.DataAccessor.DbTableAccessor import Account
 from Model.Currency import create_currency
 
 
-class AccountModel(BaseRecordModel):
-    ACCESSOR = Account
+class Account(BaseModel):
+    description = TextField()
+    value = FloatField(default=0)
+    currency_code = TextField()
+    commission_rule = TextField()
 
-    def _init_by_record(self, record):
-        self._init_by_args(iter((record.description, record.value, record.currency, record.commission_rule)))
+    # noinspection PyTypeChecker
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.compute_commission = eval(self.commission_rule)
+        self.currency = create_currency(self.currency_code)
 
-    def _init_by_args(self, iterator):
-        self.description = next(iterator)
-        self.value = next(iterator)
-        self.currency = create_currency(next(iterator))
-        self._commission_rule_text = next(iterator)  # should be 'lambda...'
-        self.commission_rule = eval(self._commission_rule_text)
+    @property
+    def transactions(self):
+        return self.transaction_
 
-    def _get_sync_kwargs(self):
-        return {
-            'description': self.description, 'value': self.value,
-            'currency': self.currency.code, 'commission_rule': self._commission_rule_text
-        }
+    @property
+    def subjects(self):
+        return set(trans.subject for trans in self.transactions)
+
+    @property
+    def balance(self):
+        result = TransactionSummarizer(self.transactions)
+        return self.value + result.income
 
     def deposit(self, amount):
         self.value += amount
@@ -33,19 +39,10 @@ class AccountModel(BaseRecordModel):
     def withdraw(self, amount):
         self.value -= amount
 
-    @property
-    def transactions(self):
-        if self.record is None:
-            raise ValueError("Non-created Account.")
-        return self.record.transactions
 
-    @property
-    def subjects(self):
-        if self.record is None:
-            raise ValueError("Non-created Account.")
-        return self.record.subjects
-
-    @property
-    def balance(self):
-        result = TransactionSummarizer(self.transactions)
-        return self.value + result.income
+def _create_tables():
+    """
+    Peewee will create tables in all-lowercases.
+    """
+    from Model.DataAccessor.DbAccessor.DbOrmAccessor import db
+    db.create_tables([Account])
