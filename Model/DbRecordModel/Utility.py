@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from Model import DbRecordModel
+
 
 class TransactionSummarizer(object):
     def __init__(self, transactions):
@@ -11,9 +13,7 @@ class TransactionSummarizer(object):
         self.summarizer(transactions)
 
     def summarizer(self, transactions):
-        from Model.DbRecordModel.TransactionModel import Transaction
-
-        if not isinstance(transactions[0], Transaction):
+        if not isinstance(transactions[0], DbRecordModel.TransactionModel.Transaction):
             raise TypeError
 
         for trans in transactions:
