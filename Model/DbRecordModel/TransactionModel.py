@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from peewee import *
+from datetime import date
 
 from Model.DataAccessor.DbAccessor.DbOrmAccessor import BaseModel, SimpleModelMap
 from Model.DbRecordModel.AccountModel import Account
@@ -22,6 +23,19 @@ class Transaction(BaseModel):
     price = FloatField(default=0)
     amount = FloatField(default=0)
     commission = FloatField(default=0)
+
+    @staticmethod
+    def create_by_raws(raws):
+        for raw in raws:
+            Transaction.create_by_raw(*raw)
+
+    @staticmethod
+    def create_by_raw(year, month, day, type_id, account_desc, subject_code, price, amount, commission):
+        date_ = date(year, month, day)
+        account = Account.get(description=account_desc)
+        subject = Subject.get(code=subject_code)
+        Transaction.create(date=date_, type_id=type_id, account=account, subject=subject,
+                           price=price, amount=amount, commission=commission)
 
 
 def _create_tables():

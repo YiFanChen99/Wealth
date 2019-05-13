@@ -88,15 +88,30 @@ def create_transactions():
     print('create_transactions end')
 
 
+def create_transactions_by_raws():
+    raws = [
+        [2019, 5, 10, 1, "FT.", "LQD", 118.83, 10, 0]
+    ]
+    Transaction.create_by_raws(raws)
+    print('create_transactions_by_raws end')
+
+
 def main2():
-    # create_transactions()
+    # create_transactions_by_raws()
+
+    sk = Account.get(id=1)
+    sk_balance = sk.balance
+
+    sk_tr = sk.transactions
+    sk_subjs = sk.subjects
+    sk_amount_list = [(sub.code, sub.holding) for sub in sk_subjs]
 
     ft = Account.get(id=2)
-    print('ft balance: ', ft.balance)
+    ft_balance = ft.balance
 
     first_tr = ft.transactions
     ft_subjs = ft.subjects
-    amount_list = [(sub.code, sub.holding) for sub in ft_subjs]
+    ft_amount_list = [(sub.code, sub.holding) for sub in ft_subjs]
     print('end')
 
 
