@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from Model.Constant import CONFIGURE
 
 
 def create_currency(code):
@@ -12,8 +13,8 @@ def create_currency(code):
 
 
 class Currency(object):
-    SYMBOL = ''
-    EXCHANGE_VALUE = 0
+    SYMBOL = '$'
+    EXCHANGE_RATE = 0
 
     def __init__(self, code=None):
         if not isinstance(code, str):
@@ -21,24 +22,47 @@ class Currency(object):
 
         self.code = code
 
-    def str(self, amount):
-        return "{} {}".format(self.SYMBOL, amount)
+    def __repr__(self):
+        return repr(self.code)
 
-    def value(self, amount):
-        return amount * self.EXCHANGE_VALUE
+    def __eq__(self, other):
+        return self.code == other.code
+
+    def __hash__(self):
+        return hash(self.code)
+
+    @classmethod
+    def format(cls, amount):
+        raise NotImplementedError
+
+    @classmethod
+    def to_ntd(cls, amount):
+        return amount * cls.EXCHANGE_RATE
+
+    @classmethod
+    def from_ntd(cls, amount):
+        return amount / cls.EXCHANGE_RATE
 
 
 class NTD(Currency):
-    SYMBOL = 'NT$'
-    EXCHANGE_VALUE = 1
+    SYMBOL = 'NT $'
+    EXCHANGE_RATE = 1
 
     def __init__(self):
         super().__init__(code='NTD')
 
+    @classmethod
+    def format(cls, amount):
+        return "{}{:.1f}萬".format(cls.SYMBOL, amount / 10000)
+
 
 class USD(Currency):
-    SYMBOL = 'US$'
-    EXCHANGE_VALUE = 30.9
+    SYMBOL = 'US $'
+    EXCHANGE_RATE = CONFIGURE.EXCHANGE_RATES['USD']
 
     def __init__(self):
         super().__init__(code='USD')
+
+    @classmethod
+    def format(cls, amount):
+        return "{}{:.1f}k".format(cls.SYMBOL, amount / 1000)

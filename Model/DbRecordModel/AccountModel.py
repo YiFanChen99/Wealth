@@ -4,7 +4,7 @@ import math  # for eval commission_rule
 from peewee import *
 
 from Model.DataAccessor.DbAccessor.DbOrmAccessor import BaseModel
-from Model.DbRecordModel.Utility import TransactionSummarizer
+from Model.DbRecordModel.Utility import TransactionSummary
 from Model.Currency import create_currency
 
 
@@ -19,6 +19,8 @@ class Account(BaseModel):
         super().__init__(*args, **kwargs)
         self.compute_commission = eval(self.commission_rule)
         self.currency = create_currency(self.currency_code)
+        self.summary = None
+        self.update_summary()
 
     @property
     def transactions(self):
@@ -30,8 +32,10 @@ class Account(BaseModel):
 
     @property
     def balance(self):
-        result = TransactionSummarizer(self.transactions)
-        return self.value + result.income
+        return self.value + self.summary.income
+
+    def update_summary(self):
+        self.summary = TransactionSummary(self.transactions)
 
     def deposit(self, amount):
         self.value += amount

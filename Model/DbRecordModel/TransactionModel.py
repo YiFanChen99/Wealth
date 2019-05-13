@@ -11,6 +11,9 @@ from Model.DbRecordModel.SubjectModel import Subject
 class TransactionType(BaseModel):
     name = TextField(unique=True)
 
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return repr(self.name)
 
@@ -36,6 +39,12 @@ class Transaction(BaseModel):
         subject = Subject.get(code=subject_code)
         Transaction.create(date=date_, type_id=type_id, account=account, subject=subject,
                            price=price, amount=amount, commission=commission)
+
+    @classmethod
+    def create(cls, **kwargs):
+        trans = super().create(**kwargs)
+        trans.account.update_summary()
+        trans.subject.update_summary()
 
 
 def _create_tables():

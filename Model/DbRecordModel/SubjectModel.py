@@ -3,12 +3,15 @@
 from peewee import *
 
 from Model.DataAccessor.DbAccessor.DbOrmAccessor import BaseModel, SimpleModelMap
-from Model.DbRecordModel.Utility import TransactionSummarizer
+from Model.DbRecordModel.Utility import TransactionSummary
 from Model.Currency import create_currency
 
 
 class SubjectType(BaseModel):
     name = TextField(unique=True)
+
+    def __str__(self):
+        return self.name
 
     def __repr__(self):
         return repr(self.name)
@@ -16,6 +19,9 @@ class SubjectType(BaseModel):
 
 class SubjectRegion(BaseModel):
     name = TextField(unique=True)
+
+    def __str__(self):
+        return self.name
 
     def __repr__(self):
         return repr(self.name)
@@ -33,6 +39,8 @@ class Subject(BaseModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.currency = create_currency(self.currency_code)
+        self.summary = None
+        self.update_summary()
 
     @property
     def transactions(self):
@@ -44,8 +52,14 @@ class Subject(BaseModel):
 
     @property
     def holding(self):
-        result = TransactionSummarizer(self.transactions)
-        return result.net_amount
+        return self.summary.net_amount
+
+    @property
+    def is_holding(self):
+        return self.holding > 0.1
+
+    def update_summary(self):
+        self.summary = TransactionSummary(self.transactions)
 
 
 def _create_tables():
