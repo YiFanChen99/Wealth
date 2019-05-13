@@ -23,9 +23,11 @@ class SubjectRegion(BaseModel):
 
 class Subject(BaseModel):
     code = TextField(unique=True)
+    name = TextField(null=True)
     type = ForeignKeyField(SubjectType, backref='subject_')
     region = ForeignKeyField(SubjectRegion, backref='subject_')
     currency_code = TextField()
+    is_fund = BooleanField()
 
     # noinspection PyTypeChecker
     def __init__(self, *args, **kwargs):

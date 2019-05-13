@@ -70,7 +70,8 @@ def main1():
 def create_subjects():
     print('type:', S_TYPE_MAP)
     print('region:', REGION_MAP)
-    sm2 = Subject.create(code='006209', type_id=1, region_id=2, currency_code='NTD')
+    sm2 = Subject.create(code='006209', name=None,
+                         type_id=1, region_id=2, currency_code='NTD', is_fund=False)
     print('create_subjects end')
 
 
