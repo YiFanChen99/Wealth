@@ -31,7 +31,7 @@ def create_transactions():
 
 def create_transactions_by_raws():
     raws = [
-        [2019, 5, 10, 1, "FT.", "LQD", 118.83, 10, 0]
+        [2019, 5, 10, 1, "TD A.", "TLT", 123.4, 202, 0]
     ]
     Transaction.create_by_raws(raws)
     print('create_transactions_by_raws end')
@@ -53,6 +53,12 @@ def print_holding_value():
                 for currency, ratio, value in hs.sorted_currencies))
 
 
+def print_holding_subjects():
+    subs = [sub for sub in Subject.select() if sub.holding > 0.1]
+    sorted_subs = sorted(iter(subs), key=lambda s: s.holding, reverse=True)
+    print(tuple((s.code, s.holding) for s in sorted_subs))
+
+
 if __name__ == "__main__":
-    print_holding_value()
+    print_holding_subjects()
     print('end')
