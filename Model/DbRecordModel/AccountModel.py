@@ -24,7 +24,7 @@ class Account(BaseModel):
 
     @property
     def transactions(self):
-        return self.transaction_
+        return sorted(self.transaction_, key=lambda tr: tr.date)
 
     @property
     def subjects(self):

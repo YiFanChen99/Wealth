@@ -10,6 +10,7 @@ class TransactionSummary(object):
     def __init__(self, transactions):
         self.income = 0
         self.net_amount = 0
+        self.avg_price = 0
         self.commission = 0
 
         self.summarize(transactions)
@@ -21,19 +22,30 @@ class TransactionSummary(object):
             raise TypeError
 
         for trans in transactions:
+            self.commission += trans.commission
+
+            history_volume = self.avg_price * self.net_amount
+            this_volume = trans.price * trans.amount
             if trans.type.name == '買':
-                self.income -= trans.price * trans.amount + trans.commission
-                self.net_amount += trans.amount
+                self.income -= this_volume + trans.commission
+                new_mount = self.net_amount + trans.amount
+                self.avg_price = (history_volume + this_volume) / new_mount
+                self.net_amount = new_mount
             elif trans.type.name == '賣':
-                self.income += trans.price * trans.amount - trans.commission
+                self.income += this_volume - trans.commission
                 self.net_amount -= trans.amount
+                if self.net_amount <= 0.1:
+                    self.net_amount = 0  # floating error
+                    self.avg_price = 0
             elif trans.type.name == '除息':
                 self.income += trans.price - trans.commission
+                self.avg_price -= trans.price / self.net_amount
             elif trans.type.name == '除權':
-                self.net_amount += trans.amount - trans.commission
+                new_mount = self.net_amount + trans.amount
+                self.avg_price *= self.net_amount / new_mount
+                self.net_amount += new_mount
             else:
                 raise NotImplementedError
-            self.commission += trans.commission
 
 
 class HoldingValueSummary(object):

@@ -18,14 +18,9 @@ def create_subjects():
 
 def create_transactions():
     ft = Account.get(id=2)
-    tlt = Subject.get(code='TLT')
-    Transaction.create(date=date(2019, 4, 30), type_id=2, account=ft, subject=tlt,
-                       price=123.38, amount=35, commission=0)
-    Transaction.create(date=date(2019, 4, 30), type_id=2, account=ft, subject=tlt,
-                       price=123.41, amount=3, commission=0)
-    agg = Subject.get(code='AGG')
-    Transaction.create(date=date(2019, 4, 30), type_id=2, account=ft, subject=agg,
-                       price=108.64, amount=18, commission=0)
+    sub = Subject.get(code='SCHH')
+    Transaction.create(date=date(2019, 5, 14), type_id=1, account=ft, subject=sub,
+                       price=44.5, amount=2, commission=0)
     print('create_transactions end')
 
 
@@ -56,9 +51,11 @@ def print_holding_value():
 def print_holding_subjects():
     subs = [sub for sub in Subject.select() if sub.holding > 0.1]
     sorted_subs = sorted(iter(subs), key=lambda s: s.holding, reverse=True)
-    print(tuple((s.code, s.holding) for s in sorted_subs))
+    print("\n".join(repr((s.code, s.holding, s.avg_cost)) for s in sorted_subs))
 
 
 if __name__ == "__main__":
+    # create_transactions()
+    print_foreign_balance()
     print_holding_subjects()
     print('end')

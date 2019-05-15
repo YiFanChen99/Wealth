@@ -44,7 +44,7 @@ class Subject(BaseModel):
 
     @property
     def transactions(self):
-        return self.transaction_
+        return sorted(self.transaction_, key=lambda tr: tr.date)
 
     @property
     def accounts(self):
@@ -57,6 +57,10 @@ class Subject(BaseModel):
     @property
     def is_holding(self):
         return self.holding > 0.1
+
+    @property
+    def avg_cost(self):
+        return self.summary.avg_price
 
     def update_summary(self):
         self.summary = TransactionSummary(self.transactions)
