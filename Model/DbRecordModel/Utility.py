@@ -24,15 +24,13 @@ class TransactionSummary(object):
         for trans in transactions:
             self.commission += trans.commission
 
-            history_volume = self.avg_price * self.net_amount
-            this_volume = trans.price * trans.amount
             if trans.type.name == '買':
-                self.income -= this_volume + trans.commission
+                self.income -= trans.volume + trans.commission
                 new_mount = self.net_amount + trans.amount
-                self.avg_price = (history_volume + this_volume) / new_mount
+                self.avg_price = (self.volume + trans.volume) / new_mount
                 self.net_amount = new_mount
             elif trans.type.name == '賣':
-                self.income += this_volume - trans.commission
+                self.income += trans.volume - trans.commission
                 self.net_amount -= trans.amount
                 if self.net_amount <= 0.1:
                     self.net_amount = 0  # floating error
@@ -46,6 +44,10 @@ class TransactionSummary(object):
                 self.net_amount += new_mount
             else:
                 raise NotImplementedError
+
+    @property
+    def volume(self):
+        return self.avg_price * self.net_amount
 
 
 class HoldingValueSummary(object):

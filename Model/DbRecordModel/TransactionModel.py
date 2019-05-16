@@ -46,6 +46,10 @@ class Transaction(BaseModel):
         trans.account.update_summary()
         trans.subject.update_summary()
 
+    @property
+    def volume(self):
+        return self.price * self.amount
+
 
 def _create_tables():
     """
