@@ -21,21 +21,22 @@ class TransactionSummary(object):
 
         for trans in transactions:
             self.commission += trans.commission
+            self.income += trans.balance_changed
 
             if trans.type.name == '買':
-                self.income -= trans.volume + trans.commission
                 new_mount = self.net_amount + trans.amount
                 self.avg_price = (self.volume + trans.volume) / new_mount
                 self.net_amount = new_mount
             elif trans.type.name == '賣':
-                self.income += trans.volume - trans.commission
                 self.net_amount -= trans.amount
                 if self.net_amount <= 0.1:
                     self.net_amount = 0  # floating error
                     self.avg_price = 0
             elif trans.type.name == '除息':
-                self.income += trans.price - trans.commission
-                self.avg_price -= trans.price / self.net_amount
+                if self.net_amount != 0:
+                    self.avg_price -= trans.price / self.net_amount
+                else:
+                    self.avg_price = 0
             elif trans.type.name == '除權':
                 new_mount = self.net_amount + trans.amount
                 self.avg_price *= self.net_amount / new_mount

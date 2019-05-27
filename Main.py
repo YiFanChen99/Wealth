@@ -70,6 +70,13 @@ def print_holding_subjects():
     print("\n".join(format_s(s) for s in sorted_subs))
 
 
+def debug_transactions(acc_id, date_=date(1988, 1, 1)):
+    acc = Account.get_by_id(acc_id)
+    raw_trs = tuple(tr for tr in acc.transactions if tr.date >= date_)
+    trs = [(tr.date, tr.subject.code, tr.type, tr.balance_changed, (tr.price, tr.amount, tr.commission)) for tr in raw_trs]
+    print(1)
+
+
 if __name__ == "__main__":
     # create_subjects()
     # create_transactions()
@@ -77,4 +84,5 @@ if __name__ == "__main__":
     print_foreign_balance()
     # print_holding_subjects()
     print_holding_value()
+    # debug_transactions(2, date(2019, 5, 1))
     print('end')

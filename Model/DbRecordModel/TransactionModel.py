@@ -56,6 +56,19 @@ class Transaction(BaseModel):
     def volume(self):
         return self.price * self.amount
 
+    @property
+    def balance_changed(self):
+        if self.type.name == '買':
+            return - (self.volume + self.commission)
+        elif self.type.name == '賣':
+            return self.volume - self.commission
+        elif self.type.name == '除息':
+            return self.price - self.commission
+        elif self.type.name == '除權':
+            return 0
+        else:
+            raise NotImplementedError
+
 
 def _create_tables():
     """
