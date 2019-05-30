@@ -77,6 +77,12 @@ class Subject(BaseModel):
     def update_summary(self):
         self.summary = TransactionSummary(self.transactions)
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.code == other
+        else:
+            return super().__eq__(other)
+
 
 def _create_tables():
     """

@@ -43,6 +43,12 @@ class Account(BaseModel):
     def withdraw(self, amount):
         self.value -= amount
 
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.description == other
+        else:
+            return super().__eq__(other)
+
 
 def _create_tables():
     """
