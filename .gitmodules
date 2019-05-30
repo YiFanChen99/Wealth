@@ -7,3 +7,6 @@
 [submodule "Model/DataAccessor/DbAccessor"]
 	path = Model/DataAccessor/DbAccessor
 	url = git@github.com:YiFanChen99/DbAccessor.git
+[submodule "PyQt/PyQtComponent"]
+	path = PyQt/PyQtComponent
+	url = git@github.com:YiFanChen99/PyQtComponent.git
